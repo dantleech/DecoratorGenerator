@@ -29,13 +29,14 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testDecorate($targetClassName)
     {
-        $object = new FactoryTestObject();
+        $object = new FactoryTestObject('parent', 'something');
         $decorated = $this->factory->decorate($object, $targetClassName);
         $something = $decorated->getSomething();
 
         $this->assertInstanceOf('\\' . $targetClassName, $decorated);
         $this->assertInstanceOf(FactoryTestObject::class, $decorated);
         $this->assertEquals('something', $something);
+        $this->assertEquals('parent', $decorated->iamParent());
     }
 
     public function provideDecorate()
@@ -48,8 +49,26 @@ class DecoratorFactoryTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class FactoryTestObject
+class ParentTestObject
 {
+    protected $parent;
+
+    function iamParent()
+    {
+        return $this->parent;
+    }
+}
+
+class FactoryTestObject extends ParentTestObject
+{
+    private $message2;
+
+    public function __construct($message1, $message2)
+    {
+        $this->parent = $message1;
+        $this->message2 = $message2;
+    }
+
     private function privateMethod()
     {
     }
@@ -61,7 +80,12 @@ class FactoryTestObject
 
     public function getSomething()
     {
-        return 'something';
+        return $this->message2;
+    }
+
+    public function iAmParent()
+    {
+        return $this->parent;
     }
 
 }
